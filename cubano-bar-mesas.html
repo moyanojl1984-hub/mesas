@@ -448,8 +448,15 @@
         <label class="field-label" for="nameInput">Nombre o alias de la reserva</label>
         <input class="name-input" id="nameInput" type="text" maxlength="60" autocomplete="name" placeholder="Ej.: Juan Pérez o @juanperez">
 
-        <label class="field-label" for="contactInput">Email o teléfono de contacto</label>
-        <input class="name-input" id="contactInput" type="text" maxlength="120" autocomplete="email" placeholder="Ej.: juan@email.com o +54 9 11...">
+        <label class="field-label" for="contactInput">Número de WhatsApp</label>
+        <input class="name-input" id="contactInput" type="tel" maxlength="20" autocomplete="tel" placeholder="Ej.: +54 9 11 1234 5678">
+        <button class="btn-secondary whatsapp-code-btn" id="requestWhatsappCodeBtn" type="button">Enviar código por WhatsApp</button>
+        <div id="whatsappVerification" hidden>
+          <label class="field-label" for="whatsappCodeInput">Código de WhatsApp</label>
+          <input class="name-input" id="whatsappCodeInput" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="Código de 6 dígitos">
+          <button class="btn-secondary whatsapp-code-btn" id="verifyWhatsappCodeBtn" type="button">Verificar código</button>
+          <div class="verification-status" id="whatsappStatus" aria-live="polite"></div>
+        </div>
 
         <div class="steps">
           <b>1.</b> Transferí la seña al alias de arriba.<br>
@@ -528,6 +535,11 @@
   const mesaEyebrow = document.getElementById("mesaEyebrow");
   const nameInput = document.getElementById("nameInput");
   const contactInput = document.getElementById("contactInput");
+  const requestWhatsappCodeBtn = document.getElementById("requestWhatsappCodeBtn");
+  const verifyWhatsappCodeBtn = document.getElementById("verifyWhatsappCodeBtn");
+  const whatsappVerification = document.getElementById("whatsappVerification");
+  const whatsappCodeInput = document.getElementById("whatsappCodeInput");
+  const whatsappStatus = document.getElementById("whatsappStatus");
   const confirmationText = document.getElementById("confirmationText");
   const toast = document.getElementById("toast");
   const freeTablesCount = document.getElementById("freeTablesCount");
@@ -535,6 +547,8 @@
 
   let estado = {};       // { "1": {status:"ocupada", ts:...}, ... }
   let mesaActual = null;
+  let whatsappVerificationToken = "";
+  let whatsappVerified = false;
   const DISPUTE_MS = 15 * 60 * 1000;
   const RATE_LIMIT_MS = 10 * 60 * 1000;
   const RATE_LIMIT_MAX = 2;
@@ -572,6 +586,50 @@
     toast.classList.add("show");
     setTimeout(()=> toast.classList.remove("show"), 2200);
   }
+
+  function normalizarWhatsapp(value){ return value.trim().replace(/[\s().-]/g, ""); }
+
+  requestWhatsappCodeBtn.addEventListener("click", async ()=>{
+    if(!USE_SECURE_RESERVATION || !firebaseFunctions){
+      showToast("La verificación WhatsApp se activará al conectar el backend.");
+      return;
+    }
+    const contacto = normalizarWhatsapp(contactInput.value);
+    if(!/^\+[1-9]\d{7,14}$/.test(contacto)){
+      contactInput.focus();
+      showToast("Usá WhatsApp con código de país, por ejemplo +54.");
+      return;
+    }
+    requestWhatsappCodeBtn.disabled = true;
+    requestWhatsappCodeBtn.textContent = "Enviando...";
+    try{
+      const response = await firebaseFunctions.httpsCallable("requestWhatsappCode")({contacto});
+      whatsappVerificationToken = response.data.verificationToken;
+      whatsappVerified = false;
+      whatsappVerification.hidden = false;
+      whatsappCodeInput.focus();
+      whatsappStatus.textContent = "Código enviado. Vence en 5 minutos.";
+    }catch(_){
+      whatsappStatus.textContent = "No se pudo enviar el código. Revisá el número e intentá de nuevo.";
+    }
+    requestWhatsappCodeBtn.disabled = false;
+    requestWhatsappCodeBtn.textContent = "Enviar código por WhatsApp";
+  });
+
+  verifyWhatsappCodeBtn.addEventListener("click", async ()=>{
+    if(!firebaseFunctions || !whatsappVerificationToken) return;
+    verifyWhatsappCodeBtn.disabled = true;
+    try{
+      const contacto = normalizarWhatsapp(contactInput.value);
+      await firebaseFunctions.httpsCallable("verifyWhatsappCode")({contacto, code:whatsappCodeInput.value.trim(), verificationToken:whatsappVerificationToken});
+      whatsappVerified = true;
+      whatsappStatus.textContent = "WhatsApp verificado. Ya podés continuar.";
+      verifyWhatsappCodeBtn.textContent = "Código verificado";
+    }catch(_){
+      whatsappStatus.textContent = "Código incorrecto o vencido.";
+      verifyWhatsappCodeBtn.disabled = false;
+    }
+  });
 
   function getRecentAttempts(){
     try{
@@ -697,6 +755,13 @@
     mesaEyebrow.textContent = "MESA " + id;
     nameInput.value = "";
     contactInput.value = "";
+    whatsappCodeInput.value = "";
+    whatsappVerificationToken = "";
+    whatsappVerified = false;
+    whatsappVerification.hidden = true;
+    whatsappStatus.textContent = "";
+    verifyWhatsappCodeBtn.disabled = false;
+    verifyWhatsappCodeBtn.textContent = "Verificar código";
     senaView.style.display = "block";
     confirmView.classList.remove("show");
     overlay.classList.add("open");
@@ -738,9 +803,13 @@
       showToast("Ingresá el nombre o alias de la reserva.");
       return;
     }
-    if(contacto.length < 5){
+    if(!/^\+[1-9]\d{7,14}$/.test(normalizarWhatsapp(contacto))){
       contactInput.focus();
-      showToast("Ingresá un email o teléfono válido.");
+      showToast("Ingresá un número de WhatsApp con código de país.");
+      return;
+    }
+    if(USE_SECURE_RESERVATION && !whatsappVerified){
+      showToast("Primero verificá tu número por WhatsApp.");
       return;
     }
     if(!rateLimitAllows()){
@@ -766,7 +835,7 @@
     let ok = false;
     if(USE_SECURE_RESERVATION && firebaseFunctions){
       try{
-        await firebaseFunctions.httpsCallable("createDispute")({mesaId: mesaActual, nombre, contacto});
+        await firebaseFunctions.httpsCallable("createDispute")({mesaId: mesaActual, nombre, contacto: normalizarWhatsapp(contacto), verificationToken: whatsappVerificationToken});
       }catch(_){
         btn.disabled = false;
         btn.textContent = "Finalizar";
