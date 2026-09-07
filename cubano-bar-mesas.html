@@ -225,6 +225,11 @@
   }
   .table-btn.loading{ opacity:0; pointer-events:none; }
   .table-btn.focus-table{animation:ultraVipPulse 1.1s ease-in-out 2}
+  body.capture-mode .table-btn:not(.pending):not(.approved){
+    background:#16b878 !important;
+    background-image:linear-gradient(145deg,#66f5bf,#16b878 55%,#08734b) !important;
+    opacity:1 !important;
+  }
   @keyframes ultraVipPulse{50%{box-shadow:0 0 0 5px rgba(46,230,166,0.28),0 0 20px rgba(46,230,166,0.85)}}
 
   .legend-note{
@@ -736,6 +741,7 @@
   });
 
   async function init(){
+    if(captureMode) document.body.classList.add("capture-mode");
     await cargarEstado();
     renderMesas();
     actualizarUltraVip();
