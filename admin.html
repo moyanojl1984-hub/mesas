@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cubano Bar | Administracion de mesas</title>
+  <style>
+    :root{--bg:#09090d;--card:#15151c;--line:#2a2a35;--text:#f4f2ef;--muted:#9b9ba5;--red:#ff2d3d;--amber:#ffbd3e}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,#321016,transparent 38%),var(--bg);color:var(--text);font:15px Arial,sans-serif}.wrap{max-width:880px;margin:auto;padding:28px 18px 52px}.head{display:flex;justify-content:space-between;gap:16px;align-items:start;border-bottom:1px solid var(--line);padding-bottom:22px}.brand{font-size:26px;font-weight:800;letter-spacing:.5px}.brand b{color:var(--red)}h1{font-size:25px;margin:28px 0 5px}.sub{color:var(--muted);margin:0 0 22px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}.stat strong{display:block;font-size:25px;margin-bottom:4px}.stat span{color:var(--muted);font-size:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}.empty{padding:34px;color:var(--muted);text-align:center}.row{display:grid;grid-template-columns:70px 1fr auto;gap:14px;align-items:center;padding:15px;border-bottom:1px solid var(--line)}.row:last-child{border:0}.mesa{font-weight:800;font-size:20px}.detail{min-width:0}.detail b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.detail small{color:var(--muted)}.badge{display:inline-block;font-size:11px;font-weight:bold;text-transform:uppercase;border-radius:99px;padding:5px 8px;margin-top:5px}.pendiente{background:#3d2b07;color:#ffd878}.aprobada{background:#461016;color:#ff8f97}.actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:end}button{border:0;border-radius:8px;padding:9px 11px;color:white;background:#30303a;cursor:pointer;font-weight:bold}button.approve{background:var(--red)}button.delete{background:transparent;border:1px solid #5c3338;color:#ffadb2}.toolbar{display:flex;gap:10px;align-items:center}.link{color:var(--text);text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-weight:bold}@media(max-width:580px){.stats{grid-template-columns:1fr}.row{grid-template-columns:52px 1fr}.actions{grid-column:1/-1;justify-content:start}.head{flex-direction:column}.toolbar{width:100%;justify-content:space-between}}
+    .login-card{max-width:420px;margin:12vh auto 0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px}.login-card h1{margin:0 0 8px}.login-card p{color:var(--muted);margin:0 0 20px}.login-card label{display:block;color:var(--muted);font-size:12px;margin:14px 0 6px}.login-card input{width:100%;border:1px solid var(--line);border-radius:8px;background:#0d0d12;color:var(--text);padding:11px}.login-card button{width:100%;margin-top:18px;background:var(--red)}.login-error{color:#ffadb2;font-size:13px;min-height:18px;margin-top:10px}.logout{background:transparent;border:1px solid var(--line)}
+        .login-card .reset{display:block;width:auto;margin:14px auto 0;padding:0;background:transparent;color:var(--muted);font-size:12px}.event-card{margin:22px 0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}.event-card h2{margin:0 0 6px;font-size:18px}.event-card p{color:var(--muted);margin:0 0 14px;font-size:13px}.event-controls{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}.event-controls label{display:block;color:var(--muted);font-size:12px}.event-controls input,.event-controls select{width:100%;margin-top:6px;border:1px solid var(--line);border-radius:8px;background:#0d0d12;color:var(--text);padding:10px}.event-controls button{background:var(--red)}.event-status{color:var(--muted);font-size:12px;margin-top:10px;min-height:16px}.heading-controls{display:grid;grid-template-columns:1.4fr 1fr .7fr 1fr auto;gap:10px;align-items:end}.print-report{display:none}.print-button{background:#0f8f68}.print-table{width:100%;border-collapse:collapse;margin-top:20px;font-size:14px}.print-table th,.print-table td{border:1px solid #c9c9c9;padding:9px;text-align:left}.print-table th{background:#eeeeee}.print-table th:nth-child(4),.print-table td:nth-child(4){min-width:72px}.print-status{font-weight:700}.print-status.free{color:#13865e}.print-status.dispute{color:#a86b00}.print-status.confirmed{color:#c21f2d}@media(max-width:700px){.event-controls,.heading-controls{grid-template-columns:1fr}.event-controls button,.heading-controls button{width:100%}}@media print{body{background:#fff;color:#111;font:12px Arial,sans-serif}.login-view,.wrap>*:not(.print-report){display:none!important}.wrap{display:block;max-width:none;padding:0}.print-report{display:block!important}.print-report h1{font-size:22px;margin:0 0 5px}.print-report p{margin:3px 0;color:#555}.print-table{font-size:11px;margin-top:12px}.print-table th{background:#eeeeee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.print-status{font-weight:700}}
+  </style>
+</head>
+<body>
+  <section class="login-card" id="loginView">
+    <h1>Acceso administrador</h1>
+    <p>Ingresá para revisar comprobantes y aprobar reservas.</p>
+    <form id="loginForm">
+      <label for="emailInput">Email</label>
+      <input id="emailInput" type="email" autocomplete="username" required>
+      <label for="passwordInput">Contraseña</label>
+      <input id="passwordInput" type="password" autocomplete="current-password" required>
+      <button type="submit">Iniciar sesión</button>
+        <button class="reset" id="resetPassword" type="button">Restablecer contraseña por email</button>
+      <div class="login-error" id="loginError" role="alert"></div>
+    </form>
+  </section>
+  <main class="wrap" id="adminApp" hidden>
+    <header class="head"><div class="brand">CUBANO<b>BAR</b></div><div class="toolbar"><button id="refresh">Actualizar</button><button id="printStatus" class="print-button" type="button">Imprimir estado</button><a class="link" href="cubano-bar-mesas.html">Ver mapa</a><button id="resetAll" class="delete" type="button">Resetear mesas</button><button class="logout" id="logout">Salir</button></div></header>
+    <h1>Administracion de reservas</h1>
+    <p class="sub">Aprueba las reservas una vez que verifiques la seña. Las aprobadas aparecen en rojo en el mapa.</p>
+    <section class="stats"><div class="stat"><strong id="pendingCount">0</strong><span>Pendientes</span></div><div class="stat"><strong id="approvedCount">0</strong><span>Aprobadas</span></div><div class="stat"><strong id="totalCount">0</strong><span>Total de reservas</span></div></section>
+    <section class="event-card">
+      <h2>Logo del evento en ULTRA VIP</h2>
+      <p>Pegá la URL pública del logo alojado en Cloudinary.</p>
+      <div class="event-controls">
+        <label>Nombre del evento<input id="eventNameInput" type="text" maxlength="50" placeholder="Ej.: Fiesta aniversario"></label>
+        <label>URL pública del logo<input id="eventLogoUrlInput" type="url" placeholder="https://res.cloudinary.com/..." required></label>
+        <button id="saveEventLogo" type="button">Guardar logo</button>
+      </div>
+      <button id="removeEventLogo" type="button" class="delete">Quitar logo</button>
+      <div class="event-status" id="eventLogoStatus"></div>
+    </section>
+    <section class="event-card">
+      <h2>Encabezado de ULTRA VIP</h2>
+      <p>Personalizá el texto, la fecha, el tamaño y la tipografía del encabezado.</p>
+      <div class="heading-controls">
+        <label>Texto<input id="headingTextInput" type="text" maxlength="30" placeholder="ULTRA VIP"></label>
+        <label>Fecha<input id="headingDateInput" type="text" maxlength="24" placeholder="Ej.: 12 OCT"></label>
+        <label>Tamaño (px)<input id="headingSizeInput" type="number" min="10" max="40" value="17"></label>
+        <label>Tipografía<select id="headingFontInput"><option value="'Bebas Neue', sans-serif">Bebas Neue</option><option value="Inter, sans-serif">Inter</option><option value="Georgia, serif">Georgia</option><option value="Arial, sans-serif">Arial</option></select></label>
+        <button id="saveHeading" type="button">Guardar</button>
+      </div>
+      <div class="event-status" id="headingStatus"></div>
+    </section>
+    <section class="print-report" id="printReport" aria-hidden="true"></section>
+    <section class="card" id="list"></section>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script>
+    firebase.initializeApp({apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY",authDomain:"mesas-cubano-bar.firebaseapp.com",projectId:"mesas-cubano-bar",storageBucket:"mesas-cubano-bar.firebasestorage.app",messagingSenderId:"1072135346765",appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04"});
+    const db=firebase.firestore();
+    const auth=firebase.auth();
+    const ADMIN_EMAILS=new Set(['moyanojl.1984@gmail.com','moyanojl1984@gmail.com']);
+    const loginView=document.getElementById('loginView');
+    const adminApp=document.getElementById('adminApp');
+    const loginForm=document.getElementById('loginForm');
+    const loginError=document.getElementById('loginError');
+    const emailInput=document.getElementById('emailInput');
+    const passwordInput=document.getElementById('passwordInput');
+    const resetPassword=document.getElementById('resetPassword');
+    const logout=document.getElementById('logout');
+    const resetAll=document.getElementById('resetAll');
+    const printStatus=document.getElementById('printStatus');
+    const printReport=document.getElementById('printReport');
+    const eventNameInput=document.getElementById('eventNameInput');
+    const eventLogoUrlInput=document.getElementById('eventLogoUrlInput');
+    const saveEventLogo=document.getElementById('saveEventLogo');
+    const removeEventLogo=document.getElementById('removeEventLogo');
+    const eventLogoStatus=document.getElementById('eventLogoStatus');
+    const headingTextInput=document.getElementById('headingTextInput');
+    const headingDateInput=document.getElementById('headingDateInput');
+    const headingSizeInput=document.getElementById('headingSizeInput');
+    const headingFontInput=document.getElementById('headingFontInput');
+    const saveHeading=document.getElementById('saveHeading');
+    const headingStatus=document.getElementById('headingStatus');
+    const TABLE_ORDER=['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','B','C','D','ULTRA VIP'];
+    loginForm.addEventListener('submit',async event=>{
+      event.preventDefault();
+      loginError.textContent='';
+      try{
+        await auth.signInWithEmailAndPassword(emailInput.value.trim(),passwordInput.value);
+      }catch(_){ loginError.textContent='Email o contraseña incorrectos.'; }
+    });
+      resetPassword.addEventListener('click',async()=>{
+        const email=emailInput.value.trim();
+        if(!email){ loginError.textContent='Ingresá tu email para recibir el enlace.'; emailInput.focus(); return; }
+        try{ await auth.sendPasswordResetEmail(email); loginError.textContent='Te enviamos un enlace para crear una contraseña nueva.'; }
+        catch(_){ loginError.textContent='No se pudo enviar el enlace. Verificá que el email esté registrado.'; }
+      });
+    logout.addEventListener('click',()=>auth.signOut());
+    resetAll.addEventListener('click',async()=>{
+      if(!confirm('Esto liberará todas las mesas y borrará todas las reservas, incluida ULTRA VIP. ¿Continuar?')) return;
+      if(!confirm('Confirmación final: todas las mesas volverán a estar libres.')) return;
+      resetAll.disabled=true;resetAll.textContent='Reseteando...';
+      try{
+        const snapshot=await db.collection('reservas').get();
+        const batch=db.batch();
+        snapshot.forEach(doc=>batch.delete(doc.ref));
+        await batch.commit();
+        alert('Todas las mesas quedaron libres y listas para el próximo evento.');
+        render();
+      }catch(_){alert('No se pudo resetear todas las mesas.');}
+      resetAll.disabled=false;resetAll.textContent='Resetear mesas';
+    });
+    function printStatusLabel(reserva){
+      if(!reserva) return {label:'Libre',className:'free'};
+      if(reserva.status==='aprobada'||reserva.status==='ocupada') return {label:'Pagado - reserva confirmada',className:'confirmed'};
+      return {label:'Señado - en disputa',className:'dispute'};
+    }
+    function renderPrintReport(){
+      const data=load();
+      const eventName=headingTextInput.value.trim()||'ULTRA VIP';
+      const eventDate=headingDateInput.value.trim();
+      const rows=TABLE_ORDER.map(mesa=>{
+        const reserva=data[mesa],state=printStatusLabel(reserva);
+        return '<tr><td>'+escapeHtml(mesa)+'</td><td>'+escapeHtml(reserva?.nombre||'-')+'</td><td class="print-status '+state.className+'">'+state.label+'</td><td class="print-amount">&nbsp;</td><td>'+(reserva?.ts?formatDate(reserva.ts):'-')+'</td></tr>';
+      }).join('');
+      printReport.innerHTML='<h1>CUBANO BAR - Estado de mesas</h1><p><strong>Evento:</strong> '+escapeHtml(eventName)+(eventDate?' | <strong>Fecha:</strong> '+escapeHtml(eventDate):'')+'</p><p>Impreso: '+new Date().toLocaleString('es-AR')+'</p><table class="print-table"><thead><tr><th>Mesa</th><th>Nombre / reserva</th><th>Estado</th><th>Monto</th><th>Fecha y hora</th></tr></thead><tbody>'+rows+'</tbody></table>';
+    }
+    printStatus.addEventListener('click',()=>{renderPrintReport();window.print();});
+    db.collection('config').doc('ultraVip').onSnapshot(doc=>{if(doc.exists){const data=doc.data();eventNameInput.value=data.eventName||'';eventLogoUrlInput.value=data.logoUrl||'';headingTextInput.value=data.headingText||'ULTRA VIP';headingDateInput.value=data.eventDate||'';headingSizeInput.value=data.headingSize||17;headingFontInput.value=data.headingFont||"'Bebas Neue', sans-serif";}});
+    saveHeading.addEventListener('click',async()=>{try{await db.collection('config').doc('ultraVip').set({headingText:headingTextInput.value.trim()||'ULTRA VIP',eventDate:headingDateInput.value.trim(),headingSize:Math.max(10,Math.min(40,Number(headingSizeInput.value)||17)),headingFont:headingFontInput.value,updatedAt:Date.now()},{merge:true});headingStatus.textContent='Encabezado actualizado.';}catch(_){headingStatus.textContent='No se pudo actualizar el encabezado.';}});
+    saveEventLogo.addEventListener('click',async()=>{
+      const logoUrl=eventLogoUrlInput.value.trim();
+      if(!logoUrl){eventLogoStatus.textContent='Pegá la URL pública del logo.';return;}
+      saveEventLogo.disabled=true;eventLogoStatus.textContent='Guardando logo...';
+      try{
+        await db.collection('config').doc('ultraVip').set({eventName:eventNameInput.value.trim(),logoUrl,updatedAt:Date.now(),updatedBy:auth.currentUser.email},{merge:true});
+        eventLogoStatus.textContent='Logo publicado correctamente.';
+      }catch(error){eventLogoStatus.textContent='No se pudo guardar el logo.';}
+      saveEventLogo.disabled=false;
+    });
+    removeEventLogo.addEventListener('click',async()=>{try{await db.collection('config').doc('ultraVip').set({logoUrl:'',eventName:'',updatedAt:Date.now()},{merge:true});eventLogoStatus.textContent='Logo quitado del mapa.';}catch(_){eventLogoStatus.textContent='No se pudo quitar el logo.';}});
+    auth.onAuthStateChanged(user=>{
+      const allowed=user && ADMIN_EMAILS.has(user.email.toLowerCase());
+      if(user && !allowed){ auth.signOut(); loginError.textContent='Esta cuenta no tiene acceso al panel.'; }
+      loginView.hidden=!!allowed;
+      adminApp.hidden=!allowed;
+    });
+    const KEY='mesas-estado';
+    let sharedData={};
+    const load=()=>sharedData;
+    const formatDate=ts=>ts?new Date(ts).toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short'}):'Sin fecha';
+    function escapeHtml(value){const el=document.createElement('div');el.textContent=value;return el.innerHTML}
+    function render(){
+      const data=load(),items=Object.entries(data).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
+      const pending=items.filter(([,r])=>r.status==='pendiente'||r.status==='disputa').length,approved=items.filter(([,r])=>r.status==='aprobada'||r.status==='ocupada').length;
+      pendingCount.textContent=pending;approvedCount.textContent=approved;totalCount.textContent=items.length;
+      list.innerHTML=items.length?'':'<div class="empty">Todavia no hay solicitudes de reserva.</div>';
+      items.forEach(([mesa,r])=>{const ok=r.status==='aprobada'||r.status==='ocupada',node=document.createElement('article');node.className='row';node.innerHTML='<div class="mesa">'+mesa+'</div><div class="detail"><b>'+escapeHtml(r.nombre||'Sin nombre')+'</b><small>'+formatDate(r.ts)+'</small><br><span class="badge '+(ok?'aprobada':'pendiente')+'">'+(ok?'Reservada confirmada':'En disputa')+'</span></div><div class="actions">'+(ok?'<button data-action="pending" data-id="'+mesa+'">Volver a disputa</button>':'<button class="approve" data-action="approve" data-id="'+mesa+'">Confirmar reserva</button>')+'<button class="delete" data-action="delete" data-id="'+mesa+'">Eliminar</button></div>';list.appendChild(node)});
+    }
+    list.addEventListener('click',async event=>{const button=event.target.closest('button[data-action]');if(!button)return;const id=button.dataset.id;try{if(button.dataset.action==='approve')await db.collection('reservas').doc(id).update({status:'aprobada',approvedAt:Date.now(),approvedBy:auth.currentUser.email});if(button.dataset.action==='pending')await db.collection('reservas').doc(id).update({status:'pendiente',approvedAt:null,approvedBy:null});if(button.dataset.action==='delete')await db.collection('reservas').doc(id).delete()}catch(_){alert('No se pudo actualizar la reserva.');}});
+    refresh.addEventListener('click',render);db.collection('reservas').onSnapshot(snapshot=>{sharedData={};snapshot.forEach(doc=>sharedData[doc.id]=doc.data());render()},()=>{list.innerHTML='<div class="empty">No se pudieron cargar las reservas. Actualiza la pagina.</div>'});
+  </script>
+</body>
+</html>
