@@ -634,6 +634,12 @@
       btn.style.left = t.x + "%";
       btn.style.top = t.y + "%";
       btn.style.setProperty("--perspective-y", t.perspectiveY || 1);
+      if(captureMode && !approved && !pending){
+        btn.style.appearance = "none";
+        btn.style.webkitAppearance = "none";
+        btn.style.backgroundColor = "#16b878";
+        btn.style.backgroundImage = "none";
+      }
       btn.innerHTML = approved ? '<span class="x-mark">X</span>' : '<span class="table-label">' + t.id + '</span>';
       btn.setAttribute("aria-label", "Mesa " + t.id + (approved ? " (aprobada)" : pending ? " (pendiente de aprobacion)" : " (libre)"));
       if(!blocked){
