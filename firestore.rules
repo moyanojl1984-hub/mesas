@@ -4,7 +4,7 @@ service cloud.firestore {
     match /config/{configId} {
       allow read: if true;
       allow write: if request.auth != null
-        && request.auth.token.email in ['moyanojl.1984@gmail.com', 'moyanojl1984@gmail.com'];
+        && request.auth.token.email in ['moyanojl.1984@gmail.com', 'moyanojl1984@gmail.com', 'gncesso@gmail.com'];
     }
     match /reservas/{mesaId} {
       allow read: if true;
@@ -20,7 +20,7 @@ service cloud.firestore {
         && request.resource.data.expiresAt > request.time.toMillis()
         && request.resource.data.expiresAt <= request.time.toMillis() + 900000;
       allow update, delete: if request.auth != null
-        && request.auth.token.email in ['moyanojl.1984@gmail.com', 'moyanojl1984@gmail.com'];
+        && request.auth.token.email in ['moyanojl.1984@gmail.com', 'moyanojl1984@gmail.com', 'gncesso@gmail.com'];
     }
   }
 }

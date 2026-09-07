@@ -121,7 +121,7 @@ exports.createDispute = onCall({
 
   if (!MESA_IDS.has(mesaId)) throw new HttpsError("invalid-argument", "Mesa inválida.");
   if (nombre.length < 1 || nombre.length > 60) throw new HttpsError("invalid-argument", "Nombre inválido.");
-  if (!/^\+[1-9]\d{7,14}$/.test(contacto) || verificationToken.length < 32) throw new HttpsError("invalid-argument", "WhatsApp no verificado.");
+  if (!/^\d{10}$/.test(contacto)) throw new HttpsError("invalid-argument", "WhatsApp inválido.");
 
   const verificationSnapshot = await verificationRef(contacto).get();
   const verification = verificationSnapshot.exists ? verificationSnapshot.data() : null;
@@ -130,7 +130,8 @@ exports.createDispute = onCall({
   }
 
   const ip = request.rawRequest?.ip || "unknown";
-  const rateLimitId = hash(`${ip}:${contacto}`);
+  const deviceId = String(data.deviceId || "unknown");
+  const rateLimitId = hash(`${ip}:${deviceId}`);
   const rateLimitRef = db.collection("rateLimits").doc(rateLimitId);
   const reservationRef = db.collection("reservas").doc(mesaId);
   const expiresAt = now + DISPUTE_MS;

@@ -68,7 +68,9 @@
     firebase.initializeApp({apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY",authDomain:"mesas-cubano-bar.firebaseapp.com",projectId:"mesas-cubano-bar",storageBucket:"mesas-cubano-bar.firebasestorage.app",messagingSenderId:"1072135346765",appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04"});
     const db=firebase.firestore();
     const auth=firebase.auth();
-    const ADMIN_EMAILS=new Set(['moyanojl.1984@gmail.com','moyanojl1984@gmail.com']);
+    const DEV_EMAILS=new Set(['gncesso@gmail.com', 'moyanojl.1984@gmail.com', 'moyanojl1984@gmail.com']);
+    const ADMIN_EMAILS=DEV_EMAILS; // Como socio, tenés ambos roles
+
     const loginView=document.getElementById('loginView');
     const adminApp=document.getElementById('adminApp');
     const loginForm=document.getElementById('loginForm');
@@ -152,7 +154,7 @@
     });
     removeEventLogo.addEventListener('click',async()=>{try{await db.collection('config').doc('ultraVip').set({logoUrl:'',eventName:'',updatedAt:Date.now()},{merge:true});eventLogoStatus.textContent='Logo quitado del mapa.';}catch(_){eventLogoStatus.textContent='No se pudo quitar el logo.';}});
     auth.onAuthStateChanged(user=>{
-      const allowed=user && ADMIN_EMAILS.has(user.email.toLowerCase());
+      const allowed = user && (ADMIN_EMAILS.has(user.email.toLowerCase()) || DEV_EMAILS.has(user.email.toLowerCase()));
       if(user && !allowed){ auth.signOut(); loginError.textContent='Esta cuenta no tiene acceso al panel.'; }
       loginView.hidden=!!allowed;
       adminApp.hidden=!allowed;
@@ -163,11 +165,21 @@
     const formatDate=ts=>ts?new Date(ts).toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short'}):'Sin fecha';
     function escapeHtml(value){const el=document.createElement('div');el.textContent=value;return el.innerHTML}
     captureMap.addEventListener('click',async()=>{
-      captureMap.disabled=true;captureStatus.textContent='Abriendo el mapa exacto...';
-      const captureWindow=window.open('cubano-bar-mesas.html?capture=admin','_blank','width=700,height=1100');
-      if(!captureWindow){captureStatus.textContent='Permití ventanas emergentes para capturar el mapa.';captureMap.disabled=false;return;}
-      captureStatus.textContent='La captura se descargará desde el mapa público.';
-      setTimeout(()=>{captureMap.disabled=false;},2500);
+      captureMap.disabled=true;
+      captureStatus.textContent='⌛ Generando imagen (esperá 5 seg)...';
+      // Abrimos una ventana con dimensiones parecidas a un móvil para que el mapa se vea bien
+      const captureWindow=window.open('cubano-bar-mesas.html?capture=admin','_blank','width=550,height=900');
+      if(!captureWindow){
+        captureStatus.textContent='⚠️ Permití ventanas emergentes.';
+        captureMap.disabled=false;
+        return;
+      }
+
+      setTimeout(()=>{
+        captureMap.disabled=false;
+        captureStatus.textContent='✅ Listo.';
+        setTimeout(() => captureStatus.textContent = '', 3000);
+      },6500);
     });
     function render(){
       const data=load(),items=Object.entries(data).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));

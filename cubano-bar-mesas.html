@@ -254,19 +254,30 @@
   }
 
   .sheet{
-    width:100%;
-    max-width:420px;
-    background:linear-gradient(180deg, var(--panel-2), var(--panel));
-    border:1px solid var(--grey-line);
-    border-bottom:none;
-    border-radius:20px 20px 0 0;
-    padding:26px 22px 28px;
-    transform:translateY(24px);
-    transition:transform .25s ease;
-    box-shadow:0 -20px 50px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--grey-line);
+    border-bottom: none;
+    border-radius: 20px 20px 0 0;
+    padding: 26px 22px 28px;
+    transform: translateY(24px);
+    transition: transform .25s ease;
+    box-shadow: 0 -20px 50px rgba(0,0,0,0.5);
+    max-height: 85vh;
+    overflow-y: auto;
   }
   @media (min-width:560px){
-    .sheet{ border-radius:20px; border-bottom:1px solid var(--grey-line); transform:translateY(0) scale(0.97); }
+    .sheet{ border-radius:20px; border-bottom:1px solid var(--grey-line); transform:translateY(0) scale(0.97); max-height: 90vh; }
+  }
+
+  .important-notice {
+    color: var(--red);
+    font-weight: 800;
+    font-size: 20px;
+    line-height: 1.3;
+    margin: 20px 0;
+    text-transform: uppercase;
   }
   .overlay.open .sheet{ transform:translateY(0) scale(1); }
 
@@ -375,6 +386,26 @@
     box-shadow:0 10px 30px rgba(0,0,0,0.5);
   }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .captcha-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1e1e26;
+    border: 2px dashed var(--grey-line);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 15px 0;
+    user-select: none;
+  }
+  .captcha-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 5px;
+    color: var(--red);
+    text-shadow: 0 0 10px var(--red-glow);
+    font-style: italic;
+  }
 </style>
 </head>
 <body>
@@ -448,15 +479,14 @@
         <label class="field-label" for="nameInput">Nombre o alias de la reserva</label>
         <input class="name-input" id="nameInput" type="text" maxlength="60" autocomplete="name" placeholder="Ej.: Juan Pérez o @juanperez">
 
-        <label class="field-label" for="contactInput">Número de WhatsApp</label>
-        <input class="name-input" id="contactInput" type="tel" maxlength="20" autocomplete="tel" placeholder="Ej.: +54 9 11 1234 5678">
-        <button class="btn-secondary whatsapp-code-btn" id="requestWhatsappCodeBtn" type="button">Enviar código por WhatsApp</button>
-        <div id="whatsappVerification" hidden>
-          <label class="field-label" for="whatsappCodeInput">Código de WhatsApp</label>
-          <input class="name-input" id="whatsappCodeInput" type="text" inputmode="numeric" maxlength="5" autocomplete="one-time-code" placeholder="Código de 5 dígitos">
-          <button class="btn-secondary whatsapp-code-btn" id="verifyWhatsappCodeBtn" type="button">Verificar código</button>
-          <div class="verification-status" id="whatsappStatus" aria-live="polite"></div>
+        <label class="field-label" for="contactInput">Número de WhatsApp (10 dígitos)</label>
+        <input class="name-input" id="contactInput" type="tel" maxlength="10" autocomplete="tel" placeholder="Ej.: 1123456789">
+
+        <div class="captcha-box">
+          <span class="captcha-num" id="captchaDisplay">12345</span>
         </div>
+        <label class="field-label" for="captchaInput">Escribí el número de arriba para continuar</label>
+        <input class="name-input" id="captchaInput" type="text" inputmode="numeric" maxlength="5" placeholder="Código de 5 dígitos">
 
         <div class="steps">
           <b>1.</b> Transferí la seña al alias de arriba.<br>
@@ -474,8 +504,9 @@
 
       <div id="confirmView" class="confirm-view">
         <div class="confirm-icon">✓</div>
-        <h2 style="text-align:center;">Mesa reservada</h2>
-        <p id="confirmationText">Tu mesa quedó marcada como ocupada.</p>
+        <h2>Mesa reservada</h2>
+        <div class="important-notice">ENVIALE A TU RR.PP EL COMPROBANTE DE PAGO TOTAL O PARCIAL DE LA RESERVA</div>
+        <p id="confirmationText">La mesa quedó en disputa por 15 minutos.</p>
         <button class="btn-primary" id="closeConfirmBtn" style="width:100%;">Listo</button>
       </div>
 
@@ -493,7 +524,10 @@
   let firebaseDb = null;
   let firebaseFunctions = null;
   const USE_SECURE_RESERVATION = false;
-  try { firebase.initializeApp(firebaseConfig); firebaseDb = firebase.firestore(); } catch (_) {}
+  try {
+    firebase.initializeApp(firebaseConfig);
+    firebaseDb = firebase.firestore();
+  } catch (_) {}
   try { if(USE_SECURE_RESERVATION) firebaseFunctions = firebase.app().functions("us-central1"); } catch (_) {}
   // ---- Posiciones de cada mesa sobre el mapa (en % del ancho/alto de la imagen) ----
   const TABLES = [
@@ -535,11 +569,8 @@
   const mesaEyebrow = document.getElementById("mesaEyebrow");
   const nameInput = document.getElementById("nameInput");
   const contactInput = document.getElementById("contactInput");
-  const requestWhatsappCodeBtn = document.getElementById("requestWhatsappCodeBtn");
-  const verifyWhatsappCodeBtn = document.getElementById("verifyWhatsappCodeBtn");
-  const whatsappVerification = document.getElementById("whatsappVerification");
-  const whatsappCodeInput = document.getElementById("whatsappCodeInput");
-  const whatsappStatus = document.getElementById("whatsappStatus");
+  const captchaDisplay = document.getElementById("captchaDisplay");
+  const captchaInput = document.getElementById("captchaInput");
   const confirmationText = document.getElementById("confirmationText");
   const toast = document.getElementById("toast");
   const freeTablesCount = document.getElementById("freeTablesCount");
@@ -547,12 +578,35 @@
 
   let estado = {};       // { "1": {status:"ocupada", ts:...}, ... }
   let mesaActual = null;
-  let whatsappVerificationToken = "";
-  let whatsappVerified = false;
+  let currentCaptcha = "";
+
+  function generateCaptcha() {
+    currentCaptcha = Math.floor(10000 + Math.random() * 90000).toString();
+    captchaDisplay.textContent = currentCaptcha;
+    captchaInput.value = "";
+  }
   const DISPUTE_MS = 15 * 60 * 1000;
   const RATE_LIMIT_MS = 10 * 60 * 1000;
   const RATE_LIMIT_MAX = 2;
   const RATE_LIMIT_KEY = "mesas-dispute-attempts";
+  const DEVICE_ID_KEY = "cubano-device-id";
+
+  function getDeviceId() {
+    let id = localStorage.getItem(DEVICE_ID_KEY);
+    if (!id) {
+      id = "dev-" + Math.random().toString(36).substring(2, 15) + Date.now();
+      localStorage.setItem(DEVICE_ID_KEY, id);
+    }
+    return id;
+  }
+
+  function getMyActiveDispute() {
+    const myDispute = JSON.parse(localStorage.getItem("my-dispute") || "null");
+    if (myDispute && myDispute.expiresAt > Date.now()) {
+      return myDispute;
+    }
+    return null;
+  }
 
   function reservaActiva(reserva){
     if(!reserva) return false;
@@ -569,15 +623,33 @@
   async function capturarMapaPublico(){
     if(!captureMode || typeof html2canvas !== "function") return;
     try{
-      await new Promise(resolve => setTimeout(resolve, 1800));
-      const canvas = await html2canvas(mapFrame, {backgroundColor:"#09090c", useCORS:true, scale:2});
+      // Esperar a que todo cargue (imagen de fondo y datos de Firebase)
+      await new Promise(resolve => setTimeout(resolve, 3500));
+
+      const reserveBtn = document.getElementById("ultraVipReserveBtn");
+      if(reserveBtn) reserveBtn.style.display = "none";
+
+      const canvas = await html2canvas(mapFrame, {
+        backgroundColor: "#060608",
+        useCORS: true,
+        scale: 2,
+        logging: true,
+        ignoreElements: (el) => el.tagName === 'IMG' && !el.src.includes('Gemini_Generated_Image')
+      });
+
       const link = document.createElement("a");
-      link.download = "mapa-mesas-" + new Date().toISOString().slice(0,10) + ".png";
       link.href = canvas.toDataURL("image/png");
+      link.download = "mapa-cubano.png";
       link.click();
-      setTimeout(() => window.close(), 500);
-    }catch(_){
-      document.title = "No se pudo capturar el mapa";
+
+      setTimeout(() => {
+        if(reserveBtn) reserveBtn.style.display = "block";
+        window.close();
+      }, 1000);
+
+    }catch(e){
+      console.error("Error capturando:", e);
+      alert("Error al generar la imagen. Verifica que el mapa cargue correctamente.");
     }
   }
 
@@ -588,48 +660,6 @@
   }
 
   function normalizarWhatsapp(value){ return value.trim().replace(/[\s().-]/g, ""); }
-
-  requestWhatsappCodeBtn.addEventListener("click", async ()=>{
-    if(!USE_SECURE_RESERVATION || !firebaseFunctions){
-      showToast("La verificación WhatsApp se activará al conectar el backend.");
-      return;
-    }
-    const contacto = normalizarWhatsapp(contactInput.value);
-    if(!/^\+[1-9]\d{7,14}$/.test(contacto)){
-      contactInput.focus();
-      showToast("Usá WhatsApp con código de país, por ejemplo +54.");
-      return;
-    }
-    requestWhatsappCodeBtn.disabled = true;
-    requestWhatsappCodeBtn.textContent = "Enviando...";
-    try{
-      const response = await firebaseFunctions.httpsCallable("requestWhatsappCode")({contacto});
-      whatsappVerificationToken = response.data.verificationToken;
-      whatsappVerified = false;
-      whatsappVerification.hidden = false;
-      whatsappCodeInput.focus();
-      whatsappStatus.textContent = "Código enviado. Vence en 5 minutos.";
-    }catch(_){
-      whatsappStatus.textContent = "No se pudo enviar el código. Revisá el número e intentá de nuevo.";
-    }
-    requestWhatsappCodeBtn.disabled = false;
-    requestWhatsappCodeBtn.textContent = "Enviar código por WhatsApp";
-  });
-
-  verifyWhatsappCodeBtn.addEventListener("click", async ()=>{
-    if(!firebaseFunctions || !whatsappVerificationToken) return;
-    verifyWhatsappCodeBtn.disabled = true;
-    try{
-      const contacto = normalizarWhatsapp(contactInput.value);
-      await firebaseFunctions.httpsCallable("verifyWhatsappCode")({contacto, code:whatsappCodeInput.value.trim(), verificationToken:whatsappVerificationToken});
-      whatsappVerified = true;
-      whatsappStatus.textContent = "WhatsApp verificado. Ya podés continuar.";
-      verifyWhatsappCodeBtn.textContent = "Código verificado";
-    }catch(_){
-      whatsappStatus.textContent = "Código incorrecto o vencido.";
-      verifyWhatsappCodeBtn.disabled = false;
-    }
-  });
 
   function getRecentAttempts(){
     try{
@@ -751,17 +781,17 @@
   });
 
   function abrirMesa(id){
+    const active = getMyActiveDispute();
+    if (active && active.mesaId !== id) {
+      showToast("Ya tenés la mesa " + active.mesaId + " en proceso. Esperá a que venza o confirmala.");
+      return;
+    }
+
     mesaActual = id;
     mesaEyebrow.textContent = "MESA " + id;
     nameInput.value = "";
     contactInput.value = "";
-    whatsappCodeInput.value = "";
-    whatsappVerificationToken = "";
-    whatsappVerified = false;
-    whatsappVerification.hidden = true;
-    whatsappStatus.textContent = "";
-    verifyWhatsappCodeBtn.disabled = false;
-    verifyWhatsappCodeBtn.textContent = "Verificar código";
+    generateCaptcha();
     senaView.style.display = "block";
     confirmView.classList.remove("show");
     overlay.classList.add("open");
@@ -798,20 +828,23 @@
     if(!mesaActual) return;
     const nombre = nameInput.value.trim();
     const contacto = contactInput.value.trim();
+
     if(!nombre){
       nameInput.focus();
       showToast("Ingresá el nombre o alias de la reserva.");
       return;
     }
-    if(!/^\+[1-9]\d{7,14}$/.test(normalizarWhatsapp(contacto))){
+    if(!/^\d{10}$/.test(normalizarWhatsapp(contacto))){
       contactInput.focus();
-      showToast("Ingresá un número de WhatsApp con código de país.");
+      showToast("Ingresá los 10 dígitos de tu WhatsApp (sin 0 ni 15).");
       return;
     }
-    if(USE_SECURE_RESERVATION && !whatsappVerified){
-      showToast("Primero verificá tu número por WhatsApp.");
+    if(captchaInput.value.trim() !== currentCaptcha){
+      captchaInput.focus();
+      showToast("El código no coincide. Intentá de nuevo.");
       return;
     }
+
     if(!rateLimitAllows()){
       showToast("Alcanzaste el límite temporal de intentos. Probá más tarde.");
       return;
@@ -835,7 +868,13 @@
     let ok = false;
     if(USE_SECURE_RESERVATION && firebaseFunctions){
       try{
-        await firebaseFunctions.httpsCallable("createDispute")({mesaId: mesaActual, nombre, contacto: normalizarWhatsapp(contacto), verificationToken: whatsappVerificationToken});
+        await firebaseFunctions.httpsCallable("createDispute")({
+          mesaId: mesaActual,
+          nombre,
+          contacto: normalizarWhatsapp(contacto),
+          verificationToken: whatsappVerificationToken,
+          deviceId: getDeviceId()
+        });
       }catch(_){
         btn.disabled = false;
         btn.textContent = "Finalizar";
@@ -853,6 +892,7 @@
     btn.textContent = "Finalizar";
 
     if(ok){
+      localStorage.setItem("my-dispute", JSON.stringify({ mesaId: mesaActual, expiresAt: now + DISPUTE_MS }));
       recordAttempt();
       renderMesas();
       actualizarUltraVip();

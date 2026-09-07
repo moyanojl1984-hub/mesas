@@ -1,0 +1,48 @@
+[debug] [2026-09-07T20:22:32.293Z] ----------------------------------------------------------------------
+[debug] [2026-09-07T20:22:32.454Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\moyan\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js serve --only hosting
+[debug] [2026-09-07T20:22:32.454Z] CLI Version:   15.28.2
+[debug] [2026-09-07T20:22:32.455Z] Platform:      win32
+[debug] [2026-09-07T20:22:32.455Z] Node Version:  v24.19.0
+[debug] [2026-09-07T20:22:32.455Z] Detected Agent: android_studio_agent
+[debug] [2026-09-07T20:22:32.455Z] Time:          Mon Sep 07 2026 17:22:32 GMT-0300 (hora estándar de Argentina)
+[debug] [2026-09-07T20:22:32.456Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-09-07T20:22:32.567Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-09-07T20:23:08.564Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-09-07T20:23:08.564Z] > authorizing via signed-in user (moyanojl1984@gmail.com)
+[debug] [2026-09-07T20:23:08.565Z] [iam] checking project mesas-cubano-bar for permissions ["firebase.projects.get"]
+[debug] [2026-09-07T20:23:08.567Z] Checked if tokens are valid: false, expires at: 1788639146314
+[debug] [2026-09-07T20:23:08.567Z] Checked if tokens are valid: false, expires at: 1788639146314
+[debug] [2026-09-07T20:23:08.567Z] > refreshing access token with scopes: []
+[debug] [2026-09-07T20:23:08.570Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-09-07T20:23:08.570Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-09-07T20:23:09.355Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-09-07T20:23:09.356Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-09-07T20:23:09.449Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/mesas-cubano-bar:testIamPermissions [none]
+[debug] [2026-09-07T20:23:09.449Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/mesas-cubano-bar:testIamPermissions  x-goog-user-project=mesas-cubano-bar
+[debug] [2026-09-07T20:23:09.449Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/mesas-cubano-bar:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-09-07T20:23:09.455Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-09-07T20:23:09.455Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-09-07T20:23:10.399Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/mesas-cubano-bar:testIamPermissions 200
+[debug] [2026-09-07T20:23:10.399Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/mesas-cubano-bar:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-09-07T20:23:10.400Z] Checked if tokens are valid: true, expires at: 1788816188356
+[debug] [2026-09-07T20:23:10.400Z] Checked if tokens are valid: true, expires at: 1788816188356
+[debug] [2026-09-07T20:23:10.400Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/mesas-cubano-bar [none]
+[debug] [2026-09-07T20:23:10.619Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/mesas-cubano-bar 200
+[debug] [2026-09-07T20:23:10.620Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/mesas-cubano-bar {"projectNumber":"1072135346765","projectId":"mesas-cubano-bar","lifecycleState":"ACTIVE","name":"mesas cubano bar","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2026-09-04T19:18:24.715Z"}
+[debug] [2026-09-07T20:23:10.622Z] Checked if tokens are valid: true, expires at: 1788816188356
+[debug] [2026-09-07T20:23:10.622Z] Checked if tokens are valid: true, expires at: 1788816188356
+[debug] [2026-09-07T20:23:10.622Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/mesas-cubano-bar/sites 
+[debug] [2026-09-07T20:23:11.791Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/mesas-cubano-bar/sites 200
+[debug] [2026-09-07T20:23:11.791Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/mesas-cubano-bar/sites {"sites":[{"name":"projects/mesas-cubano-bar/sites/mesas-cubano-bar","defaultUrl":"https://mesas-cubano-bar.web.app","type":"DEFAULT_SITE"}]}
+[debug] [2026-09-07T20:23:11.792Z] Checked if tokens are valid: true, expires at: 1788816188356
+[debug] [2026-09-07T20:23:11.792Z] Checked if tokens are valid: true, expires at: 1788816188356
+[debug] [2026-09-07T20:23:11.792Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/mesas-cubano-bar/webApps/-/config [none]
+[debug] [2026-09-07T20:23:13.110Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/mesas-cubano-bar/webApps/-/config 200
+[debug] [2026-09-07T20:23:13.110Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/mesas-cubano-bar/webApps/-/config {"projectId":"mesas-cubano-bar","appId":"1:1072135346765:web:e8a6ee5497366a8b1f5a04","storageBucket":"mesas-cubano-bar.firebasestorage.app","apiKey":"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY","authDomain":"mesas-cubano-bar.firebaseapp.com","messagingSenderId":"1072135346765","projectNumber":"1072135346765","version":"2"}
+[debug] [2026-09-07T20:23:15.421Z] Checked if tokens are valid: true, expires at: 1788816188356
+[debug] [2026-09-07T20:23:15.421Z] Checked if tokens are valid: true, expires at: 1788816188356
+[debug] [2026-09-07T20:23:15.421Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/mesas-cubano-bar [none]
+[debug] [2026-09-07T20:23:15.737Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/mesas-cubano-bar 200
+[debug] [2026-09-07T20:23:15.737Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/mesas-cubano-bar {"projectId":"mesas-cubano-bar","projectNumber":"1072135346765","displayName":"mesas cubano bar","name":"projects/mesas-cubano-bar","resources":{"hostingSite":"mesas-cubano-bar"},"state":"ACTIVE","labels":{"firebase":"enabled"},"etag":"1_71ddc24e-ed91-4084-bf7f-70e54510e1c1"}
+[info] +  hosting[mesas-cubano-bar]: Local server: http://localhost:5000 {"metadata":{"emulator":{"name":"hosting"},"message":"Local server: \u001b[4m\u001b[1mhttp://localhost:5000\u001b[22m\u001b[24m"}}
