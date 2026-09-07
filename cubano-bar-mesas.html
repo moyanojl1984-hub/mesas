@@ -101,9 +101,6 @@
   .map-heading strong .event-date{margin-left:8px;color:var(--green);font-family:inherit;font-size:.72em;letter-spacing:.8px}
   .map-heading-actions{display:flex;align-items:center;gap:10px;margin-left:auto;}
   .map-heading-actions span{color:var(--green);white-space:nowrap;}
-  .share-map-btn{border:1px solid var(--grey-line);border-radius:999px;background:var(--panel-2);color:var(--white);padding:7px 11px;font:600 10px 'Inter',sans-serif;letter-spacing:.6px;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
-  .share-map-btn:hover{border-color:var(--green);color:var(--green);}
-  .share-map-btn:focus-visible{outline:2px solid var(--green);outline-offset:2px;}
   .ultra-vip-overlay{position:absolute;left:52%;top:11.5%;z-index:3;width:34%;padding:0;border:0;background:transparent;color:var(--green);font:clamp(15px,3.5vw,24px) 'Bebas Neue',sans-serif;letter-spacing:1px;line-height:1;cursor:pointer;text-align:center;text-shadow:0 1px 3px #000}
   .ultra-vip-overlay:hover{color:#fff}
   .ultra-vip-overlay.dispute{color:#f6b73c}
@@ -392,7 +389,7 @@
   </div>
 
   <div class="map-wrap" id="ultraVipSection" aria-label="Sección Ultra VIP">
-    <div class="map-heading"><strong id="ultraVipHeading">ULTRA VIP</strong><div class="map-heading-actions"><span id="freeTablesCount" aria-live="polite">23 mesas libres</span><button class="share-map-btn" id="shareMapBtn" type="button">Compartir mapa</button></div></div>
+    <div class="map-heading"><strong id="ultraVipHeading">ULTRA VIP</strong><div class="map-heading-actions"><span id="freeTablesCount" aria-live="polite">23 mesas libres</span></div></div>
     <div class="map-frame" id="mapFrame">
       <button class="ultra-vip-overlay" id="ultraVipReserveBtn" type="button" aria-label="Reservar en ULTRA VIP">RESERVAR</button>
       <img class="event-logo-overlay" id="eventLogoOverlay" alt="Logo del evento ULTRA VIP">
@@ -519,7 +516,6 @@
   const confirmationText = document.getElementById("confirmationText");
   const toast = document.getElementById("toast");
   const freeTablesCount = document.getElementById("freeTablesCount");
-  const shareMapBtn = document.getElementById("shareMapBtn");
 
   let estado = {};       // { "1": {status:"ocupada", ts:...}, ... }
   let mesaActual = null;
@@ -625,23 +621,6 @@
     });
     actualizarContador();
   }
-
-  async function compartirMapa(){
-    const shareData = { title:"Mapa de mesas - Cubano Bar", text:"Elegí tu mesa en el mapa de Cubano Bar", url:window.location.href };
-    try{
-      if(navigator.share){
-        await navigator.share(shareData);
-        return;
-      }
-      await navigator.clipboard.writeText(shareData.url);
-      showToast("Enlace del mapa copiado.");
-    }catch(error){
-      if(error && error.name === "AbortError") return;
-      showToast("No se pudo compartir el enlace.");
-    }
-  }
-
-  shareMapBtn.addEventListener("click", compartirMapa);
 
   function actualizarUltraVip(){
     const reserva = estado["ULTRA VIP"];
