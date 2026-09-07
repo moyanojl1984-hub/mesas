@@ -10,7 +10,15 @@ service cloud.firestore {
       allow read: if true;
       allow create: if request.resource.data.status in ['pendiente', 'disputa']
         && request.resource.data.nombre is string
-        && request.resource.data.ts is int;
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 60
+        && request.resource.data.contacto is string
+        && request.resource.data.contacto.size() >= 5
+        && request.resource.data.contacto.size() <= 120
+        && request.resource.data.ts is int
+        && request.resource.data.expiresAt is int
+        && request.resource.data.expiresAt > request.time.toMillis()
+        && request.resource.data.expiresAt <= request.time.toMillis() + 900000;
       allow update, delete: if request.auth != null
         && request.auth.token.email in ['moyanojl.1984@gmail.com', 'moyanojl1984@gmail.com'];
     }
