@@ -479,11 +479,15 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
   const firebaseConfig = { apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY", authDomain:"mesas-cubano-bar.firebaseapp.com", projectId:"mesas-cubano-bar", storageBucket:"mesas-cubano-bar.firebasestorage.app", messagingSenderId:"1072135346765", appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04" };
   let firebaseDb = null;
+  let firebaseFunctions = null;
+  const USE_SECURE_RESERVATION = false;
   try { firebase.initializeApp(firebaseConfig); firebaseDb = firebase.firestore(); } catch (_) {}
+  try { if(USE_SECURE_RESERVATION) firebaseFunctions = firebase.app().functions("us-central1"); } catch (_) {}
   // ---- Posiciones de cada mesa sobre el mapa (en % del ancho/alto de la imagen) ----
   const TABLES = [
     { id:"19", x:59.1, y:18.0 },
@@ -759,8 +763,22 @@
     }
 
     const now = Date.now();
-    estado[mesaActual] = { status:"disputa", nombre, contacto, ts: now, expiresAt: now + DISPUTE_MS };
-    const ok = await guardarEstado();
+    let ok = false;
+    if(USE_SECURE_RESERVATION && firebaseFunctions){
+      try{
+        await firebaseFunctions.httpsCallable("createDispute")({mesaId: mesaActual, nombre, contacto});
+      }catch(_){
+        btn.disabled = false;
+        btn.textContent = "Finalizar";
+        showToast("No se pudo validar la solicitud. Probá de nuevo.");
+        return;
+      }
+      estado[mesaActual] = { status:"disputa", nombre, contacto, ts: now, expiresAt: now + DISPUTE_MS };
+      ok = true;
+    }else{
+      estado[mesaActual] = { status:"disputa", nombre, contacto, ts: now, expiresAt: now + DISPUTE_MS };
+      ok = await guardarEstado();
+    }
 
     btn.disabled = false;
     btn.textContent = "Finalizar";
