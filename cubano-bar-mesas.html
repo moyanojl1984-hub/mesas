@@ -470,6 +470,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
   const firebaseConfig = { apiKey:"AIzaSyC44gcXFwvIlPLI3RGJq1iHW6S2cMgcfvY", authDomain:"mesas-cubano-bar.firebaseapp.com", projectId:"mesas-cubano-bar", storageBucket:"mesas-cubano-bar.firebasestorage.app", messagingSenderId:"1072135346765", appId:"1:1072135346765:web:e8a6ee5497366a8b1f5a04" };
   let firebaseDb = null;
@@ -516,6 +517,7 @@
   const confirmationText = document.getElementById("confirmationText");
   const toast = document.getElementById("toast");
   const freeTablesCount = document.getElementById("freeTablesCount");
+  const captureMode = new URLSearchParams(window.location.search).get("capture") === "admin";
 
   let estado = {};       // { "1": {status:"ocupada", ts:...}, ... }
   let mesaActual = null;
@@ -530,6 +532,21 @@
     const ocupadas = TABLES.filter(t => reservaActiva(estado[t.id])).length;
     const libres = Math.max(0, TABLES.length - ocupadas);
     freeTablesCount.textContent = libres + (libres === 1 ? " mesa libre" : " mesas libres");
+  }
+
+  async function capturarMapaPublico(){
+    if(!captureMode || typeof html2canvas !== "function") return;
+    try{
+      await new Promise(resolve => setTimeout(resolve, 1800));
+      const canvas = await html2canvas(mapFrame, {backgroundColor:"#09090c", useCORS:true, scale:2});
+      const link = document.createElement("a");
+      link.download = "mapa-mesas-" + new Date().toISOString().slice(0,10) + ".png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      setTimeout(() => window.close(), 500);
+    }catch(_){
+      document.title = "No se pudo capturar el mapa";
+    }
   }
 
   function showToast(msg){
@@ -734,6 +751,7 @@
     }
   }
   init();
+  capturarMapaPublico();
 </script>
 </body>
 </html>
