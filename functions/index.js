@@ -62,7 +62,7 @@ exports.requestWhatsappCode = onCall({
   if (existing.exists && Number(existing.data().sentAt) > Date.now() - 60000) {
     throw new HttpsError("resource-exhausted", "Esperá un minuto antes de pedir otro código.");
   }
-  const code = String(crypto.randomInt(100000, 1000000));
+  const code = String(crypto.randomInt(10000, 100000));
   const token = crypto.randomBytes(32).toString("hex");
   await sendWhatsappCode(phone, code);
   await ref.set({
@@ -84,7 +84,7 @@ exports.verifyWhatsappCode = onCall({
   const phone = normalizeWhatsapp(request.data?.contacto);
   const code = String(request.data?.code || "").trim();
   const token = String(request.data?.verificationToken || "");
-  if (!/^\+[1-9]\d{7,14}$/.test(phone) || !/^\d{6}$/.test(code) || token.length < 32) {
+  if (!/^\+[1-9]\d{7,14}$/.test(phone) || !/^\d{5}$/.test(code) || token.length < 32) {
     throw new HttpsError("invalid-argument", "Código o teléfono inválido.");
   }
   const ref = verificationRef(phone);
